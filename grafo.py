@@ -2,16 +2,11 @@
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
-class Vertice:
-  rotulo: str
-  index: int
-
 @dataclass(init=False)
 class Grafo:
-    vertices: dict[int, Vertice]
-    mapa_vizinhos: dict[Vertice, set[Vertice]]
-    mapa_pesos: dict[frozenset[Vertice], float]
+    rotulos: dict[int, str]
+    mapa_vizinhos: dict[int, set[int]]
+    mapa_pesos: dict[frozenset[int], float]
 
     @classmethod
     def ler_arquivo(self, file_name):
@@ -41,8 +36,8 @@ class Grafo:
                 if ler_arestas:
                     partes = linha.split()
                     if len(partes) == 3:
-                        u = grafo.vertice(int(partes[0]))
-                        v = grafo.vertice(int(partes[1]))
+                        u = int(partes[0])
+                        v = int(partes[1])
                         w = float(partes[2])
                         grafo.adicionar_aresta(u, v, w)
         
@@ -50,12 +45,12 @@ class Grafo:
 
 
     def __init__(self):
-        self.vertices = {}
+        self.rotulos = {}
         self.mapa_vizinhos = {}
         self.mapa_pesos = {}
 
     def qtdVertices(self, ):
-        return len(self.vertices)
+        return len(self.rotulos)
     
     def qtdArestas(self, ):
         return len(self.mapa_pesos)
@@ -64,7 +59,7 @@ class Grafo:
         return len(self.mapa_vizinhos.get(v, set()))
     
     def rotulo(self, v):
-        return v.rotulo
+        return self.rotulos[v]
     
     def vizinhos(self, v):
         return self.mapa_vizinhos.get(v, set())
@@ -75,16 +70,12 @@ class Grafo:
     def peso(self, u, v):
         return self.mapa_pesos.get(frozenset({u, v}), 0)
 
-    def vertice(self, index):
-        return self.vertices[index]
-
     def adicionar_vertice(self, rotulo, index):
-        if index in self.vertices:
+        if index in self.rotulos:
             raise ValueError(f"Vertice with index {index} already exists.")
 
-        vertice = Vertice(rotulo, index)
-        self.vertices[index] = vertice
-        self.mapa_vizinhos[vertice] = set()
+        self.rotulos[index] = rotulo
+        self.mapa_vizinhos[index] = set()
 
     def adicionar_aresta(self, u, v, w):
         key = frozenset({u, v})
