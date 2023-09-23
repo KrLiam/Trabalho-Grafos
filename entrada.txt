@@ -3,6 +3,7 @@
 2 rotulo_de_2
 3 rotulo_de_3
 4 rotulo_de_4
+5 rotulo_de_5
 *edges
 1 2 20
 1 3 30
