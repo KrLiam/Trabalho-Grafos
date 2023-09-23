@@ -49,6 +49,9 @@ class Grafo:
         self.mapa_vizinhos = {}
         self.mapa_pesos = {}
 
+    def vertices(self):
+        return set(self.rotulos.keys())
+
     def qtdVertices(self, ):
         return len(self.rotulos)
     
