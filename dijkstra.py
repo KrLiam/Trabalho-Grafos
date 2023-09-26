@@ -4,7 +4,7 @@ from heapq import heappop, heappush
 
 def dijkstra(grafo: Grafo, s: int) -> tuple[dict[int, int], dict[int, int]]:
     D = {v: float("inf") for v in grafo.vertices()}
-    A = {}
+    A = {v: None for v in grafo.vertices()}
     C = {}
     
     D[s] = 0
