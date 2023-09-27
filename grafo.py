@@ -52,6 +52,9 @@ class Grafo:
     def vertices(self):
         return set(self.rotulos.keys())
 
+    def arestas(self):
+        return set(self.mapa_pesos.keys())
+
     def qtdVertices(self, ):
         return len(self.rotulos)
     
