@@ -6,7 +6,7 @@ from dataclasses import dataclass
 class Grafo:
     rotulos: dict[int, str]
     mapa_vizinhos: dict[int, set[int]]
-    mapa_pesos: dict[frozenset[int], float]
+    mapa_pesos: dict[frozenset[int], int]
 
     @classmethod
     def ler_arquivo(self, file_name):
@@ -38,7 +38,7 @@ class Grafo:
                     if len(partes) == 3:
                         u = int(partes[0])
                         v = int(partes[1])
-                        w = float(partes[2])
+                        w = int(partes[2])
                         grafo.adicionar_aresta(u, v, w)
         
         return grafo
