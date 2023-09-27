@@ -1,8 +1,3 @@
-
-from dataclasses import dataclass
-
-
-@dataclass(init=False)
 class Grafo:
     rotulos: dict[int, str]
     mapa_vizinhos: dict[int, set[int]]
@@ -12,24 +7,24 @@ class Grafo:
     def ler_arquivo(self, file_name):
         grafo = Grafo()
 
-        with open(file_name, 'r') as arquivo:
+        with open(file_name, "r") as arquivo:
             ler_vertices = False
             ler_arestas = False
 
             for linha in arquivo:
                 linha = linha.strip()
-                
-                if linha.startswith('*vertices'):
+
+                if linha.startswith("*vertices"):
                     ler_vertices = True
                     continue
-                
+
                 if ler_vertices:
                     partes = linha.split()
                     if len(partes) == 2:
                         index, rotulo = partes
                         grafo.adicionar_vertice(rotulo, int(index))
-                
-                if linha.startswith('*edges'):
+
+                if linha.startswith("*edges"):
                     ler_arestas = True
                     continue
 
@@ -40,9 +35,8 @@ class Grafo:
                         v = int(partes[1])
                         w = int(partes[2])
                         grafo.adicionar_aresta(u, v, w)
-        
-        return grafo
 
+        return grafo
 
     def __init__(self):
         self.rotulos = {}
@@ -55,24 +49,24 @@ class Grafo:
     def arestas(self):
         return set(self.mapa_pesos.keys())
 
-    def qtdVertices(self, ):
+    def qtdVertices(self):
         return len(self.rotulos)
-    
-    def qtdArestas(self, ):
+
+    def qtdArestas(self):
         return len(self.mapa_pesos)
-    
+
     def grau(self, v):
         return len(self.mapa_vizinhos.get(v, set()))
-    
+
     def rotulo(self, v):
         return self.rotulos[v]
-    
+
     def vizinhos(self, v):
         return self.mapa_vizinhos.get(v, set())
-    
+
     def hasAresta(self, u, v):
         return frozenset({u, v}) in self.mapa_pesos
-    
+
     def peso(self, u, v):
         return self.mapa_pesos.get(frozenset({u, v}), 0)
 

@@ -1,6 +1,7 @@
 from grafo import Grafo
 
-def buscaLargura (grafo: Grafo, s: int) -> tuple[dict[int, int], dict[int, int]]:
+
+def buscaLargura(grafo: Grafo, s: int) -> tuple[dict[int, int], dict[int, int]]:
     C = set()
     D = {v: float("inf") for v in grafo.vertices()}
     A = {v: None for v in grafo.vertices()}
@@ -33,7 +34,6 @@ if __name__ == "__main__":
         while u is not None:
             caminho.append(u)
             u = A[u]
-            # print(u)
 
         caminho_str = ",".join(str(i) for i in reversed(caminho))
         print(f"{v}: {caminho_str}")
