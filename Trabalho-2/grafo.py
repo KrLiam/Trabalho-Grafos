@@ -3,41 +3,6 @@ class Grafo:
     mapa_vizinhos: dict[int, set[int]]
     mapa_pesos: dict[frozenset[int], int]
 
-    @classmethod
-    def ler_arquivo(self, file_name):
-        grafo = Grafo()
-
-        with open(file_name, "r") as arquivo:
-            ler_vertices = False
-            ler_arestas = False
-
-            for linha in arquivo:
-                linha = linha.strip()
-
-                if linha.startswith("*vertices"):
-                    ler_vertices = True
-                    continue
-
-                if ler_vertices:
-                    partes = linha.split()
-                    if len(partes) == 2:
-                        index, rotulo = partes
-                        grafo.adicionar_vertice(rotulo, int(index))
-
-                if linha.startswith("*edges"):
-                    ler_arestas = True
-                    continue
-
-                if ler_arestas:
-                    partes = linha.split()
-                    if len(partes) == 3:
-                        u = int(partes[0])
-                        v = int(partes[1])
-                        w = int(partes[2])
-                        grafo.adicionar_aresta(u, v, w)
-
-        return grafo
-
     def __init__(self):
         self.rotulos = {}
         self.mapa_vizinhos = {}
@@ -59,7 +24,7 @@ class Grafo:
         return len(self.mapa_vizinhos.get(v, set()))
 
     def rotulo(self, v):
-        return self.rotulos[v]
+        return self.rotulos.get(v)
 
     def vizinhos(self, v):
         return self.mapa_vizinhos.get(v, set())
@@ -81,8 +46,8 @@ class Grafo:
         key = frozenset({u, v})
         self.mapa_pesos[key] = w
 
-        self.mapa_vizinhos[u].add(v)
-        self.mapa_vizinhos[v].add(u)
+        self.mapa_vizinhos.setdefault(u, set()).add(v)
+        self.mapa_vizinhos.setdefault(u, set()).add(u)
 
 
 class GrafoDirigido:
@@ -90,41 +55,6 @@ class GrafoDirigido:
     mapa_vizinhos: dict[int, tuple[int, int]]
     mapa_pesos: dict[tuple[int, int], int]
 
-    @classmethod
-    def ler_arquivo(self, file_name):
-        grafo = Grafo()
-
-        with open(file_name, "r") as arquivo:
-            ler_vertices = False
-            ler_arestas = False
-
-            for linha in arquivo:
-                linha = linha.strip()
-
-                if linha.startswith("*vertices"):
-                    ler_vertices = True
-                    continue
-
-                if ler_vertices:
-                    partes = linha.split()
-                    if len(partes) == 2:
-                        index, rotulo = partes
-                        grafo.adicionar_vertice(rotulo, int(index))
-
-                if linha.startswith("*edges"):
-                    ler_arestas = True
-                    continue
-
-                if ler_arestas:
-                    partes = linha.split()
-                    if len(partes) == 3:
-                        u = int(partes[0])
-                        v = int(partes[1])
-                        w = int(partes[2])
-                        grafo.adicionar_aresta(u, v, w)
-
-        return grafo
-
     def __init__(self):
         self.rotulos = {}
         self.mapa_vizinhos = {}
@@ -146,16 +76,16 @@ class GrafoDirigido:
         return len(self.mapa_vizinhos.get(v, set()))
 
     def rotulo(self, v):
-        return self.rotulos[v]
+        return self.rotulos.get(v)
 
     def vizinhos(self, v):
         return self.mapa_vizinhos.get(v, set())
 
     def hasAresta(self, u, v):
-        return frozenset({u, v}) in self.mapa_pesos
+        return (u, v) in self.mapa_pesos
 
     def peso(self, u, v):
-        return self.mapa_pesos.get(frozenset({u, v}), 0)
+        return self.mapa_pesos.get((u, v), 0)
 
     def adicionar_vertice(self, rotulo, index):
         if index in self.rotulos:
@@ -165,8 +95,55 @@ class GrafoDirigido:
         self.mapa_vizinhos[index] = set()
 
     def adicionar_aresta(self, u, v, w):
-        key = frozenset({u, v})
+        key = (u, v)
         self.mapa_pesos[key] = w
 
-        self.mapa_vizinhos[u].add(v)
-        self.mapa_vizinhos[v].add(u)
+        self.mapa_vizinhos.setdefault(u, set()).add(v)
+        self.mapa_vizinhos.setdefault(u, set()).add(u)
+
+
+def ler_arquivo(file_name):
+    grafo = None
+    vertices = []
+    arestas = []
+
+    with open(file_name, "r", encoding="utf-8") as arquivo:
+        ler_vertices = False
+        ler_arestas = False
+
+        for linha in arquivo:
+            linha = linha.strip()
+
+            if linha.startswith("*vertices"):
+                ler_vertices = True
+                continue
+
+            if ler_vertices:
+                partes = linha.split()
+                if len(partes) == 2:
+                    index, rotulo = partes
+                    vertices.append((rotulo, int(index)))
+
+            if linha.startswith("*edges"):
+                ler_arestas = True
+                grafo = Grafo()
+                continue
+
+            if linha.startswith("*arcs"):
+                ler_arestas = True
+                grafo = GrafoDirigido()
+                continue
+
+            if ler_arestas:
+                partes = linha.split()
+                if len(partes) == 3:
+                    arestas.append((int(partes[0]), int(partes[1]), int(partes[2])))
+
+
+    for rotulo, nome in vertices:
+        grafo.adicionar_vertice(rotulo, nome)
+    
+    for u, v, w in arestas:
+        grafo.adicionar_aresta(u, v, w)
+
+    return grafo
