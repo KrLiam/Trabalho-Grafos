@@ -47,7 +47,7 @@ class Grafo:
         self.mapa_pesos[key] = w
 
         self.mapa_vizinhos.setdefault(u, set()).add(v)
-        self.mapa_vizinhos.setdefault(u, set()).add(u)
+        self.mapa_vizinhos.setdefault(v, set()).add(u)
 
 
 class GrafoDirigido:
