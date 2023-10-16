@@ -33,7 +33,7 @@ def dfs_ord(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, int]]:
             
 
 if __name__ == "__main__":
-    grafo = ler_arquivo("Trabalho-2/entrada.txt")
+    grafo = ler_arquivo("entrada.txt")
 
     F, T, A = dfs_ord(grafo)
 
