@@ -1,7 +1,7 @@
 from grafo import GrafoDirigido, ler_arquivo
 
 
-def dfs_ord(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, int]]:
+def buscaProfundidade(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, int]]:
     C = set()
     T = {v: float("inf") for v in grafo.vertices()}
     F = {v: float("inf") for v in grafo.vertices()}
@@ -29,13 +29,13 @@ def dfs_ord(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, int]]:
         if u not in C:
             dfs_visit(u)
 
-    return F, T, A
+    return C, F, T, A
             
 
 if __name__ == "__main__":
     grafo = ler_arquivo("entrada.txt")
 
-    F, T, A = dfs_ord(grafo)
+    C, F, T, A = buscaProfundidade(grafo)
 
     for v in grafo.vertices():
         caminho = [v]
