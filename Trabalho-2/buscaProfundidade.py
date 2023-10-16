@@ -29,7 +29,7 @@ def buscaProfundidade(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, i
         if u not in C:
             dfs_visit(u)
 
-    return C, F, T, A
+    return C, T, A, F
             
 
 if __name__ == "__main__":
