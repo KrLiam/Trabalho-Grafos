@@ -1,4 +1,4 @@
-from grafo import Grafo
+from grafo import Grafo, ler_arquivo
 
 
 def buscaProfundidade(grafo: Grafo, s: int) -> tuple[dict[int, int], dict[int, int]]:
@@ -25,7 +25,7 @@ def buscaProfundidade(grafo: Grafo, s: int) -> tuple[dict[int, int], dict[int, i
 
 
 if __name__ == "__main__":
-    grafo = Grafo.ler_arquivo("entrada.txt")
+    grafo = ler_arquivo("entrada.txt")
 
     C,T, A = buscaProfundidade(grafo, 1)
     for v in grafo.vertices():
