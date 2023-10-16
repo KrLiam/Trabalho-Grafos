@@ -1,33 +1,42 @@
-from grafo import Grafo, ler_arquivo
+from grafo import GrafoDirigido, ler_arquivo
 
 
-def buscaProfundidade(grafo: Grafo, s: int) -> tuple[dict[int, int], dict[int, int]]:
+def dfs_ord(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, int]]:
     C = set()
     T = {v: float("inf") for v in grafo.vertices()}
+    F = {v: float("inf") for v in grafo.vertices()}
     A = {v: None for v in grafo.vertices()}
-
-    C.add(s)
+    
     tempo = 0
-    S = [s]
 
-    while S:
+    def dfs_visit(v):
+        nonlocal tempo
+
+        C.add(v)
         tempo += 1
-        u = S.pop(len(S)-1)
-        T[u] = tempo
+        T[v] = tempo
 
-        for v in grafo.vizinhos(u):
-            if v not in C:
-                A[v] = u
-                S.append(v)
-                C.add(v)
+        for u in grafo.vizinhos(v):
+            if u not in C:
+                A[u] = v
+                dfs_visit(u)
 
-    return C,T, A
+        tempo += 1
+        F[v] = tempo
 
+
+    for u in grafo.vertices():
+        if u not in C:
+            dfs_visit(u)
+
+    return F, T, A
+            
 
 if __name__ == "__main__":
-    grafo = ler_arquivo("entrada.txt")
+    grafo = ler_arquivo("Trabalho-2/entrada.txt")
 
-    C,T, A = buscaProfundidade(grafo, 1)
+    F, T, A = dfs_ord(grafo)
+
     for v in grafo.vertices():
         caminho = [v]
     
@@ -36,6 +45,7 @@ if __name__ == "__main__":
             caminho.append(u)
             u = A[u]
 
+
         caminho_str = ",".join(str(i) for i in reversed(caminho))
         print(f"{v}: {caminho_str}")
-        print(T[v])
+        print(f"Inicio: {T[v]} - Fim: {F[v]}")
