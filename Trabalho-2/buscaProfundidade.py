@@ -35,7 +35,7 @@ def buscaProfundidade(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, i
 if __name__ == "__main__":
     grafo = ler_arquivo("entrada.txt")
 
-    C, F, T, A = buscaProfundidade(grafo)
+    C, T, A, F = buscaProfundidade(grafo)
 
     for v in grafo.vertices():
         caminho = [v]
