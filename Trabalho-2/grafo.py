@@ -101,7 +101,14 @@ class GrafoDirigido:
         self.mapa_vizinhos.setdefault(u, set()).add(v)
         self.mapa_vizinhos.setdefault(u, set()).add(u)
 
+    def inverter_arestas(self):
+        novo_mapa_pesos = {}
 
+        for (u, v), peso in self.mapa_pesos.items():
+            novo_mapa_pesos[(v, u)] = peso
+
+        self.mapa_pesos = novo_mapa_pesos
+        
 def ler_arquivo(file_name):
     grafo = None
     vertices = []
