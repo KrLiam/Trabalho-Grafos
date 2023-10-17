@@ -1,7 +1,7 @@
 from grafo import GrafoDirigido, ler_arquivo
 
 
-def buscaProfundidade(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, int]]:
+def buscaProfundidade(grafo: GrafoDirigido, opcao, ordem_decrescente) -> tuple[dict[int, int], dict[int, int]]:
     C = set()
     T = {v: float("inf") for v in grafo.vertices()}
     F = {v: float("inf") for v in grafo.vertices()}
@@ -25,17 +25,26 @@ def buscaProfundidade(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, i
         F[v] = tempo
 
 
-    for u in grafo.vertices():
-        if u not in C:
-            dfs_visit(u)
+    if opcao == 0:
+        for u in grafo.vertices():
+            if u not in C:
+                dfs_visit(u)
+
+    elif opcao == 1:
+        for u in ordem_decrescente:
+            if u not in C:
+                dfs_visit(u)
+
+
+
 
     return C, T, A, F
             
 
 if __name__ == "__main__":
-    grafo = ler_arquivo("entrada.txt")
+    grafo = ler_arquivo("Trabalho-2/entrada.txt")
 
-    C, T, A, F = buscaProfundidade(grafo)
+    C, T, A, F= buscaProfundidade(grafo)
 
     for v in grafo.vertices():
         caminho = [v]
@@ -49,3 +58,6 @@ if __name__ == "__main__":
         caminho_str = ",".join(str(i) for i in reversed(caminho))
         print(f"{v}: {caminho_str}")
         print(f"Inicio: {T[v]} - Fim: {F[v]}")
+    print(A)
+    print(F)
+
