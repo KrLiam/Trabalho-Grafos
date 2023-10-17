@@ -13,7 +13,7 @@ def CFC(grafo: GrafoDirigido):
 
 
 if __name__ == "__main__":
-    grafo = ler_arquivo("Trabalho-2/entrada.txt")
+    grafo = ler_arquivo("entrada.txt")
     componentes = CFC(grafo)
     print(componentes)
 
