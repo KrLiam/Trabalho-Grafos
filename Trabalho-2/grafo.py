@@ -46,8 +46,13 @@ class Grafo:
         key = frozenset({u, v})
         self.mapa_pesos[key] = w
 
-        self.mapa_vizinhos.setdefault(u, set()).add(v)
-        self.mapa_vizinhos.setdefault(v, set()).add(u)
+        if not u in self.rotulos:
+            self.adicionar_vertice(str(u), u)
+        if not v in self.rotulos:
+            self.adicionar_vertice(str(v), v)
+
+        self.mapa_vizinhos[u].add(v)
+        self.mapa_vizinhos[v].add(u)
 
 
 class GrafoDirigido:
@@ -98,8 +103,13 @@ class GrafoDirigido:
         key = (u, v)
         self.mapa_pesos[key] = w
 
-        self.mapa_vizinhos.setdefault(u, set()).add(v)
-        self.mapa_vizinhos.setdefault(u, set()).add(u)
+        if not u in self.rotulos:
+            self.adicionar_vertice(str(u), u)
+        if not v in self.rotulos:
+            self.adicionar_vertice(str(v), v)
+
+        self.mapa_vizinhos[u].add(v)
+        self.mapa_vizinhos[v].add(u)
 
 
 
