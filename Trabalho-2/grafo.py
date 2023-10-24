@@ -154,18 +154,22 @@ def ler_arquivo(file_name):
 
             if linha.startswith("*edges"):
                 ler_arestas = True
+                ler_vertices = False
                 grafo = Grafo()
                 continue
 
             if linha.startswith("*arcs"):
                 ler_arestas = True
+                ler_vertices = False
                 grafo = GrafoDirigido()
                 continue
 
             if ler_arestas:
                 partes = linha.split()
-                if len(partes) == 3:
-                    arestas.append((int(partes[0]), int(partes[1]), int(partes[2])))
+                if len(partes) >= 2:
+                    str_u, str_v, *resto = partes
+                    str_peso = "0" if not resto else resto[0]
+                    arestas.append((int(str_u), int(str_v), int(str_peso)))
 
 
     for rotulo, nome in vertices:
