@@ -109,7 +109,6 @@ class GrafoDirigido:
             self.adicionar_vertice(str(v), v)
 
         self.mapa_vizinhos[u].add(v)
-        self.mapa_vizinhos[v].add(u)
 
 
 
