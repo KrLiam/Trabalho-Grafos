@@ -43,7 +43,7 @@ if __name__ == "__main__":
     for k, v in A.items():
         if v == None:
             continue
-        somatorio += grafo.peso(k,v)
+        somatorio += grafo.peso(v,k)
         lista.append((str(k)+"-"+str(v)))
 
     print(somatorio)
