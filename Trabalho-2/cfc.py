@@ -43,8 +43,13 @@ def calcular_componentes(antecessores: dict[int, int | None]):
     return resultado
 
 
-if __name__ == "__main__":
+def main():
     grafo = ler_arquivo("entrada.txt")
+    
+    if not isinstance(grafo, GrafoDirigido):
+        print("Entrada é inválida. Espera-se um grafo dirigido ✨")
+        return
+
     antecessores = CFC(grafo)
     componentes = calcular_componentes(antecessores)
 
@@ -54,3 +59,6 @@ if __name__ == "__main__":
             for componente in componentes
         )
     )
+
+if __name__ == "__main__":
+    main()

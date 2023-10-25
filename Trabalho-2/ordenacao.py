@@ -32,9 +32,17 @@ def dfs_ord(grafo: GrafoDirigido) -> tuple[dict[int, int], dict[int, int]]:
     return O
             
 
-if __name__ == "__main__":
+def main():
     grafo = ler_arquivo("entrada.txt")
+
+    if not isinstance(grafo, GrafoDirigido):
+        print("Entrada é inválida. Espera-se um grafo dirigido ✨")
+        return
 
     O = dfs_ord(grafo)
 
     print(" -> ".join(grafo.rotulo(v) for v in O))
+
+
+if __name__ == "__main__":
+    main()

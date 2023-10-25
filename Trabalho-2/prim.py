@@ -33,8 +33,12 @@ def prim(grafo: Grafo):
     return A
 
 
-if __name__ == "__main__":
+def main():
     grafo = ler_arquivo("entrada.txt")
+
+    if not isinstance(grafo, Grafo):
+        print("Entrada é inválida. Espera-se um grafo não-dirigido ✨")
+        return
 
     A = prim(grafo)
     somatorio = 0
@@ -50,5 +54,5 @@ if __name__ == "__main__":
     print(', '.join(lista))
         
 
-        
-
+if __name__ == "__main__":
+    main()
