@@ -128,6 +128,24 @@ class GrafoDirigido:
 
         self.mapa_vizinhos = novo_mapa_vizinhos
         self.mapa_pesos = novo_mapa_pesos
+
+    def criar_grafo_residual(self):
+        grafo_residual = GrafoDirigido()
+        grafo_residual.rotulos = self.rotulos.copy()
+        grafo_residual.mapa_vizinhos = {v: set() for v in self.vertices()}
+
+        # Adiciona as arestas originais e as arestas residuais com peso 0
+        for u, v in self.arestas():
+            peso_original = self.peso(u, v)
+            grafo_residual.adicionar_aresta(u, v, peso_original)
+            if not grafo_residual.hasAresta(v, u):
+                grafo_residual.adicionar_aresta(v, u, 0)
+
+        return grafo_residual
+
+
+
+
         
 def ler_arquivo(file_name):
     grafo = None

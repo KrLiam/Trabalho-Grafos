@@ -24,7 +24,7 @@ def buscaLargura(grafo: Grafo, s: int) -> tuple[dict[int, int], dict[int, int]]:
 
 
 if __name__ == "__main__":
-    grafo = Grafo.ler_arquivo("entrada.txt")
+    grafo = Grafo.ler_arquivo("Trabalho-3\entrada.txt")
 
     D, A = buscaLargura(grafo, 1)
     for v in grafo.vertices():
