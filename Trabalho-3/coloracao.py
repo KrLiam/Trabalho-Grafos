@@ -23,13 +23,13 @@ def conjunto_potencia(conjunto: set[T], decrescente: bool = False) -> set[frozen
         yield frozenset()
 
 
-def get_I(grafo: Grafo) -> set[frozenset[int]]:
+def get_I(vertices: frozenset[int], arestas: set[frozenset[int]]) -> set[frozenset[int]]:
     R = set()
 
     # para cada subconjunto X dos vertices do grafo, em ordem crescente de tamanho
-    for X in conjunto_potencia(grafo.vertices()):
+    for X in conjunto_potencia(vertices):
         # testa se nenhum par de vértices u, v em X possui uma aresta
-        if not any(grafo.hasAresta(u, v) for u in X for v in X):
+        if not any(frozenset((u, v)) in arestas for u in X for v in X):
             # remover todos os subconjuntos de X
             R.difference_update(conjunto_potencia(X))
             # adiciona conjunto X
@@ -43,43 +43,47 @@ def filtrar_arestas(arestas: Iterable[Iterable[int]], subvertices: set[int]):
     pertencem ao conjunto `subvertices` fornecido.
     """
     return {
-        (u, v) for u, v in arestas if u in subvertices and v in subvertices
+        frozenset((u, v)) for u, v in arestas if u in subvertices and v in subvertices
     }
 
 def lawler_recursivo(grafo: Grafo):
-    S = grafo.vertices()
-    arestas = grafo.arestas()
+    def d(S: frozenset[int], arestas: set[frozenset[int]], cims: tuple[frozenset[int], ...] = ()):
+        if not len(S):
+            return (0, cims)
+        
+        c, conjs = min(
+            d(Si := S - I, filtrar_arestas(arestas, Si), cims + (I,))
+            for I in get_I(S, arestas)
+        )
 
-    if not len(S):
-        return 0
-    
-    return 1 + min(
-        lawler_recursivo(Grafo(Si := S - I, filtrar_arestas(arestas, Si)))
-        for I in get_I(grafo)
-    )
+        return (c + 1, conjs)
+
+    return d(grafo.vertices(), grafo.arestas())
 
 
 def lawler(grafo: Grafo):
     X = {}
-    X[0] = 0
+
+    X[hash(frozenset())] = 0
 
     # subconjuntos em ordem crescente de tamanho
-    subsets = list(conjunto_potencia(grafo.vertices()))
+    subsets = conjunto_potencia(grafo.vertices())
+    # descarta o conjunto vazio
+    next(subsets)
 
-    # para cada subconjunto exceto o conjunto vazio
-    for S in subsets[1:]:
-        s = subsets.index(S)
+    # para cada subconjunto restante
+    for S in subsets:
+        s = hash(S)
         X[s] = float("inf")
 
-        G = Grafo(S, filtrar_arestas(grafo.arestas(), S))
-
-        for I in get_I(G):
-            i = subsets.index(S - I)
+        for I in get_I(S, filtrar_arestas(grafo.arestas(), S)):
+            i = hash(S - I)
 
             if X[i] + 1 < X[s]:
                 X[s] = X[i] + 1
     
-    return X[len(subsets) - 1]
+    # retorna o valor em X do último subconjunto
+    return X[hash(S)]
 
 
 def coloracao(grafo: Grafo, k_cores: int) -> Generator[tuple[int, int], None, None]:
@@ -151,8 +155,8 @@ CORES.extend(_extra_colors)
 
 
 def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
-    import matplotlib.pyplot as plt
     import networkx as nx
+    import matplotlib.pyplot as plt
 
     ng = nx.Graph()
     ng.add_nodes_from(grafo.vertices())
@@ -161,40 +165,44 @@ def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
     pos = nx.spring_layout(ng)
 
     if interval is None:
-        interval = 0.3 / max(1, grafo.qtdVertices())
-
-    if k_cores is None:
-        k_cores = lawler(grafo)
+        interval = 1 / max(1, grafo.qtdVertices())
 
     cores = {}
 
-    fig = plt.figure()
+    print("Determinando número cromático do grafo...")
+    _, grupos = lawler_recursivo(grafo)
+    print(f"k = {len(grupos)}")
+
+    fig = plt.figure(layout="tight")
     ax = fig.add_subplot(111)
 
     plt.show(block=False)
 
-    for v, cor in coloracao(grafo, k_cores):
-        cores[v] = CORES[cor - 1]
+    for i, grupo in enumerate(grupos):
+        for v in grupo:
+            cores[v] = CORES[i]
+            print(f"Coloriu vértice {v} com {cores[v]}")
 
-    ax.clear()
-    plt.axis("off")
+            ax.clear()
+            nx.draw_networkx_nodes(
+                ng,
+                pos,
+                ax=ax,
+                node_color=[cores.get(u, "black") for u in ng],
+            )
+            nx.draw_networkx_edges(ng, pos, ax=ax, alpha=0.25)
+            nx.draw_networkx_labels(ng, pos, ax=ax, font_color="white")
 
-    nx.draw_networkx_nodes(
-        ng,
-        pos,
-        ax=ax,
-        node_color=[cores.get(v, "black") for v in ng],
-    )
-    nx.draw_networkx_edges(ng, pos, ax=ax, alpha=0.25)
-    nx.draw_networkx_labels(ng, pos, ax=ax, font_color="white")
-    plt.draw_if_interactive()
+            fig.canvas.draw()
+            fig.canvas.flush_events()
 
-    fig.canvas.draw()
-    fig.canvas.flush_events()
-    sleep(interval)
+            sleep(interval)
+    
+    plt.show()
 
 
 if __name__ == "__main__":
-    g = ler_arquivo("entrada.txt")
+    g = ler_arquivo("cor4.net")
 
     print(lawler(g))
+    # mostrar_coloracao(g)
