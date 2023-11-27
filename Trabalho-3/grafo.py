@@ -1,12 +1,22 @@
+from typing import Iterable
+
+
 class Grafo:
     rotulos: dict[int, str]
     mapa_vizinhos: dict[int, set[int]]
-    mapa_pesos: dict[frozenset[int], int]
+    mapa_pesos: dict[frozenset[int], float]
 
-    def __init__(self):
+    def __init__(self, vertices: Iterable[int] = (), arestas: Iterable[Iterable[int]] = ()):
         self.rotulos = {}
         self.mapa_vizinhos = {}
         self.mapa_pesos = {}
+
+        for v in vertices:
+            self.adicionar_vertice(str(v), v)
+        
+        for aresta in arestas:
+            u, v, *w = aresta
+            self.adicionar_aresta(u, v, w[0] if w else 0)
 
     def vertices(self):
         return set(self.rotulos.keys())
@@ -33,7 +43,7 @@ class Grafo:
         return frozenset({u, v}) in self.mapa_pesos
 
     def peso(self, u, v):
-        return self.mapa_pesos.get(frozenset({u, v}), 0)
+        return self.mapa_pesos.get(frozenset({u, v}), 0.0)
 
     def adicionar_vertice(self, rotulo, index):
         if index in self.rotulos:
@@ -58,7 +68,7 @@ class Grafo:
 class GrafoDirigido:
     rotulos: dict[int, str]
     mapa_vizinhos: dict[int, tuple[int, int]]
-    mapa_pesos: dict[tuple[int, int], int]
+    mapa_pesos: dict[tuple[int, int], float]
 
     def __init__(self):
         self.rotulos = {}
@@ -90,7 +100,7 @@ class GrafoDirigido:
         return (u, v) in self.mapa_pesos
 
     def peso(self, u, v):
-        return self.mapa_pesos.get((u, v), 0)
+        return self.mapa_pesos.get((u, v), 0.0)
 
     def adicionar_vertice(self, rotulo, index):
         if index in self.rotulos:
@@ -186,7 +196,7 @@ def ler_arquivo(file_name):
                 if len(partes) >= 2:
                     str_u, str_v, *resto = partes
                     str_peso = "0" if not resto else resto[0]
-                    arestas.append((int(str_u), int(str_v), int(str_peso)))
+                    arestas.append((int(str_u), int(str_v), float(str_peso)))
 
 
     for rotulo, nome in vertices:
