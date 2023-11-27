@@ -1,16 +1,18 @@
-
 from itertools import combinations
-from math import ceil
 from random import shuffle
 from time import sleep
-from typing import Any, Generator, Iterable, TypeVar
+from typing import Generator, Iterable, TypeVar, overload
 
 from matplotlib.colors import get_named_colors_mapping
 from grafo import Grafo, ler_arquivo
 
 
 T = TypeVar("T")
-def conjunto_potencia(conjunto: set[T], decrescente: bool = False) -> set[frozenset[T]]:
+
+
+def conjunto_potencia(
+    conjunto: set[T], decrescente: bool = False
+) -> Generator[frozenset[T], None, None]:
     if not decrescente:
         yield frozenset()
 
@@ -23,7 +25,9 @@ def conjunto_potencia(conjunto: set[T], decrescente: bool = False) -> set[frozen
         yield frozenset()
 
 
-def get_I(vertices: frozenset[int], arestas: set[frozenset[int]]) -> set[frozenset[int]]:
+def get_I(
+    vertices: frozenset[int], arestas: set[frozenset[int]]
+) -> set[frozenset[int]]:
     R = set()
 
     # para cada subconjunto X dos vertices do grafo, em ordem crescente de tamanho
@@ -34,8 +38,9 @@ def get_I(vertices: frozenset[int], arestas: set[frozenset[int]]) -> set[frozens
             R.difference_update(conjunto_potencia(X))
             # adiciona conjunto X
             R.add(X)
-        
+
     return R
+
 
 def filtrar_arestas(arestas: Iterable[Iterable[int]], subvertices: set[int]):
     """
@@ -46,22 +51,26 @@ def filtrar_arestas(arestas: Iterable[Iterable[int]], subvertices: set[int]):
         frozenset((u, v)) for u, v in arestas if u in subvertices and v in subvertices
     }
 
+
 def lawler_recursivo(grafo: Grafo):
-    def d(S: frozenset[int], arestas: set[frozenset[int]], cims: tuple[frozenset[int], ...] = ()):
+    def d(
+        S: set[int],
+        arestas: set[frozenset[int]],
+        cims: tuple[frozenset[int], ...] = (),
+    ):
         if not len(S):
             return (0, cims)
-        
+
         c, conjs = min(
             d(Si := S - I, filtrar_arestas(arestas, Si), cims + (I,))
             for I in get_I(S, arestas)
         )
-
         return (c + 1, conjs)
 
     return d(grafo.vertices(), grafo.arestas())
 
 
-def lawler(grafo: Grafo):
+def lawler(grafo: Grafo) -> int:
     X = {}
 
     X[hash(frozenset())] = 0
@@ -81,12 +90,12 @@ def lawler(grafo: Grafo):
 
             if X[i] + 1 < X[s]:
                 X[s] = X[i] + 1
-    
+
     # retorna o valor em X do último subconjunto
     return X[hash(S)]
 
 
-def coloracao(grafo: Grafo, k_cores: int) -> Generator[tuple[int, int], None, None]:
+def coloracao(grafo: Grafo) -> tuple[int, tuple[frozenset[int], ...]]:
     vertices = sorted(grafo.vertices(), key=lambda v: -grafo.grau(v))
 
     cores = {}
@@ -94,41 +103,17 @@ def coloracao(grafo: Grafo, k_cores: int) -> Generator[tuple[int, int], None, No
     for v in vertices:
         cores_vizinhos = {cor for u in grafo.vizinhos(v) if (cor := cores.get(u))}
 
-        for c in range(1, k_cores+1):
+        for c in range(1, len(vertices) + 1):
             if c not in cores_vizinhos:
                 cores[v] = c
-                yield v, c
-
                 break
-    
-    return cores
 
+    k = max(cores[v] for v in vertices)
+    grupos = [set() for _ in range(k)]
+    for v, cor in cores.items():
+        grupos[cor - 1].add(v)
 
-def numero_cromatico(grafo: Grafo):
-    num_vertices = grafo.qtdVertices()
-
-    c = 0
-    def partition(min_k, max_k):
-        nonlocal c
-        c += 1
-        if c > 50:
-            return 0
-
-        if min_k == max_k:
-            return min_k
-
-        k = (min_k + max_k) // 2
-        print(f"{min_k=}, {max_k=}, {k=}")
-        num_colorido = len([*coloracao(grafo, k)])
-        print(f"{num_colorido=}")
-
-        if num_colorido >= num_vertices:
-            return partition(min_k, k)
-        else:
-            return partition(k+1, max_k)
-    
-    return partition(0, num_vertices)
-
+    return (k, tuple(frozenset(g) for g in grupos))
 
 
 CORES = [
@@ -197,7 +182,7 @@ def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
             fig.canvas.flush_events()
 
             sleep(interval)
-    
+
     plt.show()
 
 
