@@ -1,4 +1,5 @@
 from typing import Iterable
+from dataclasses import dataclass
 
 
 class Grafo:
@@ -75,6 +76,17 @@ class GrafoDirigido:
         self.mapa_vizinhos = {}
         self.mapa_pesos = {}
 
+    def copia(self):
+        novo = GrafoDirigido()
+
+        for vertice in self.vertices():
+            novo.adicionar_vertice(self.rotulo(vertice), vertice)
+        
+        for u, v in self.arestas():
+            novo.adicionar_aresta(u, v, self.peso(u, v))
+        
+        return novo
+
     def vertices(self):
         return set(self.rotulos.keys())
 
@@ -108,6 +120,16 @@ class GrafoDirigido:
 
         self.rotulos[index] = rotulo
         self.mapa_vizinhos[index] = set()
+    
+    def criar_vertice(self):
+        vertices = self.vertices()
+        i = 1
+        while i in vertices:
+            i += 1
+        
+        self.adicionar_vertice(str(i), i)
+
+        return i
 
     def adicionar_aresta(self, u, v, w):
         key = (u, v)
@@ -119,8 +141,12 @@ class GrafoDirigido:
             self.adicionar_vertice(str(v), v)
 
         self.mapa_vizinhos[u].add(v)
+    
+    def remover_aresta(self, u, v):
+        key = (u, v)
 
-
+        del self.mapa_pesos[key]
+        self.mapa_vizinhos[u].remove(v)
 
     def inverter_arestas(self):
         novo_mapa_vizinhos = {}
@@ -138,22 +164,37 @@ class GrafoDirigido:
 
         self.mapa_vizinhos = novo_mapa_vizinhos
         self.mapa_pesos = novo_mapa_pesos
+    
 
     def criar_grafo_residual(self):
-        grafo_residual = GrafoDirigido()
-        grafo_residual.rotulos = self.rotulos.copy()
-        grafo_residual.mapa_vizinhos = {v: set() for v in self.vertices()}
+        grafo = self.copia()
 
-        # Adiciona as arestas originais e as arestas residuais com peso 0
-        for u, v in self.arestas():
-            peso_original = self.peso(u, v)
-            grafo_residual.adicionar_aresta(u, v, peso_original)
-            if not grafo_residual.hasAresta(v, u):
-                grafo_residual.adicionar_aresta(v, u, 0)
+        # remover arestas que formam um ciclo do tipo u ~> v ~> u
+        # e substituir u ~> p ~> v ~> p ~> v.
+        arestas_removidas = []
+        for u, v in grafo.arestas():
+            if (u, v) in arestas_removidas:
+                continue
 
-        return grafo_residual
+            if grafo.hasAresta(v, u):
+                w = grafo.peso(v, u)
+                grafo.remover_aresta(v, u)
 
+                p = grafo.criar_vertice()
+                grafo.adicionar_aresta(v, p, w)
+                grafo.adicionar_aresta(p, u, w)
 
+                arestas_removidas.append((v, u))
+
+        # Adiciona as arestas residuais no sentido inverso com peso 0
+        for u, v in grafo.arestas():
+            grafo.adicionar_aresta(v, u, 0)
+
+        return grafo
+
+    def alterar_peso_aresta(self, u, v, novo_peso):
+        if (u, v) in self.mapa_pesos:
+            self.mapa_pesos[(u, v)] = novo_peso
 
 
         
