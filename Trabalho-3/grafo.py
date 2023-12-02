@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, TypeVar
 from dataclasses import dataclass
 
 
@@ -7,17 +7,10 @@ class Grafo:
     mapa_vizinhos: dict[int, set[int]]
     mapa_pesos: dict[frozenset[int], float]
 
-    def __init__(self, vertices: Iterable[int] = (), arestas: Iterable[Iterable[int]] = ()):
+    def __init__(self):
         self.rotulos = {}
         self.mapa_vizinhos = {}
         self.mapa_pesos = {}
-
-        for v in vertices:
-            self.adicionar_vertice(str(v), v)
-        
-        for aresta in arestas:
-            u, v, *w = aresta
-            self.adicionar_aresta(u, v, w[0] if w else 0)
 
     def vertices(self):
         return set(self.rotulos.keys())
@@ -197,9 +190,37 @@ class GrafoDirigido:
             self.mapa_pesos[(u, v)] = novo_peso
 
 
+class GrafoBipartido(Grafo):
+    def __init__(self):
+        super().__init__()
+        self._vertices_x = set()
+        self._vertices_y = set()
+
+    def adicionar_aresta(self, u, v, w):
+        if u in self._vertices_y:
+            u, v = v, u
         
-def ler_arquivo(file_name):
-    grafo = None
+        if u not in self._vertices_x and v in self._vertices_x:
+            raise ValueError(f"Não pôde inserir aresta {{{u}, {v}}} em grafo bipartido. Ambos os vértices estão em X.")
+
+        if u in self._vertices_y and v in self._vertices_y:
+            raise ValueError(f"Não pôde inserir aresta {{{u}, {v}}} em grafo bipartido. Ambos os vértices estão em Y.")
+        
+        self._vertices_x.add(v)
+        self._vertices_y.add(v)
+
+        super().adicionar_aresta(u, v, w)
+    
+    def verticesX(self):
+        return frozenset(self.vertices() - self._vertices_y)
+
+    def verticesY(self):
+        return frozenset(self._vertices_y)
+
+
+T = TypeVar("T")
+def ler_arquivo(file_name, tipo: type[T]) -> T:
+    grafo = tipo()
     vertices = []
     arestas = []
 
@@ -223,13 +244,11 @@ def ler_arquivo(file_name):
             if linha.startswith("*edges"):
                 ler_arestas = True
                 ler_vertices = False
-                grafo = Grafo()
                 continue
 
             if linha.startswith("*arcs"):
                 ler_arestas = True
                 ler_vertices = False
-                grafo = GrafoDirigido()
                 continue
 
             if ler_arestas:

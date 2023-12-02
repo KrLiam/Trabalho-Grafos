@@ -65,7 +65,7 @@ def mostrar_grafo(grafo: GrafoDirigido):
 
 
 if __name__ == "__main__":
-    grafo = ler_arquivo("wiki.net")
+    grafo = ler_arquivo("wiki.net", GrafoDirigido)
 
     # Pedi pro chat gpt fazer essa funcao do grafo residual, entao nao sei se ta funcionando como devia
     grafo_residual = grafo.criar_grafo_residual()

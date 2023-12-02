@@ -1,4 +1,4 @@
-from grafo import Grafo, GrafoDirigido, ler_arquivo
+from grafo import Grafo, GrafoDirigido, GrafoBipartido, ler_arquivo
 from Ford_Fulkerson import FordFulkerson
 from coloracao import get_I, filtrar_arestas
 
@@ -88,39 +88,29 @@ def emparelhamento_fluxo(grafo: Grafo, X: set[int], Y: set[int]):
 
 def main():
     nome_arquivo = input("Arquivo de entrada: ")
-    grafo = ler_arquivo(nome_arquivo)
+    grafo = ler_arquivo(nome_arquivo, GrafoBipartido)
 
-    if grafo.qtdVertices() <= 20:   
-        XY = []
+    X = grafo.verticesX()
+    Y = grafo.verticesY()
 
-        print("Determinando conjuntos X e Y...")
+    X_fmt = ','.join(str(n) for n in X)
+    Y_fmt = ','.join(str(n) for n in Y)
+    print(F"X={X_fmt}\nY={Y_fmt}")
 
-        for Xi in get_I(grafo.vertices(), grafo.arestas()):
-            Yi = grafo.vertices() - Xi
-            if not filtrar_arestas(grafo.arestas(), Yi):
-                XY.append((Xi, Yi))
+    while True:
+        value = input("Deseja-se utilizar estes conjuntos de X e Y? [S/n]: ")
 
-        if not XY:
-            print("O grafo não é bipartido.")
-            return
+        if not value:
+            value = "s"
 
-        for i, (xi, yi) in enumerate(XY):
-            xi_formatted = ','.join(str(n) for n in xi)
-            yi_formatted = ','.join(str(n) for n in yi)
-            print(F"{i} - X={xi_formatted}, Y={yi_formatted}")
-        conj_i = int(input("Digite o índice da opção: "))
-
-        X, Y = XY[conj_i]
-    else:
-        print(
-            "O grafo é muito grande para determinar os conjuntos X e Y.",
-            "Digite os conjuntos de vértices separados por espaços. Exemplo: 1 3 5 7",
-            sep="\n"
-        )
+        if value.strip().lower() in ("s", "n"):
+            result = value == "s"
+            break
+    
+    if not result:
+        print("Digite os conjuntos de vértices separados por espaços. Exemplo: 1 3 5 7")
         X = [int(n) for n in input("X: ").strip().split()]
         Y = [int(n) for n in input("Y: ").strip().split()]
-
-
 
     m, mate = HopcroftKarp(grafo, X, Y)
     emparelhamento_fluxo(grafo, X, Y)
