@@ -1,7 +1,12 @@
-from grafo import Grafo
+from grafo import Grafo, GrafoDirigido
 
 
-def EdmondsKarp(grafo: Grafo, s: int, t:int, grafo_residual: Grafo) -> tuple[dict[int, int], dict[int, int]]:
+def EdmondsKarp(
+    grafo: GrafoDirigido,
+    s: int,
+    t:int,
+    grafo_residual: GrafoDirigido
+) -> tuple[dict[int, int], dict[int, int]]:
     #Configurando todos os vertices
     C = set()
     A = {v: None for v in grafo.vertices()}

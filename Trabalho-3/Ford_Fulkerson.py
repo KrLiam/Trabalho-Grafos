@@ -4,12 +4,14 @@ from Edmonds_Karp import EdmondsKarp
 
 def FordFulkerson(
     grafo: GrafoDirigido, s: int, t: int, grafo_residual: GrafoDirigido
-) -> tuple[dict[int, int], dict[int, int]]:
+) -> tuple[int, tuple[int, ...]]:
     F = 0
+    caminhos = []
+
     while True:
         # Encontrar um caminho que não fora analisado ainda
         p = EdmondsKarp(grafo, s, t, grafo_residual)
-        print(f"caminho aumentante: {p}")
+        # print(f"caminho aumentante: {p}")
         if p == 0:
             break
 
@@ -22,7 +24,8 @@ def FordFulkerson(
 
         fp = min(arestas)
         F += fp
-        print(f"fluxo aumentado em {fp}")
+        # print(f"fluxo aumentado em {fp}")
+        caminhos.append(p)
 
         # Atualizando a capacidade residual
         for i in range(len(p) - 1):
@@ -32,7 +35,7 @@ def FordFulkerson(
             grafo_residual.alterar_peso_aresta(u, v, grafo_residual.peso(u, v) - fp)
             grafo_residual.alterar_peso_aresta(v, u, grafo_residual.peso(v, u) + fp)
 
-    return F
+    return F, caminhos
 
 
 def mostrar_grafo(grafo: GrafoDirigido):
