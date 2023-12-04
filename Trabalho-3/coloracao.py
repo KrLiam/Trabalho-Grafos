@@ -105,10 +105,12 @@ def lawler(grafo: Grafo) -> int:
     return X[hash(S)]
 
 
-def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
+def mostrar_coloracao(grafo: Grafo, interval=None):
     import networkx as nx
     from matplotlib.colors import get_named_colors_mapping
     import matplotlib.pyplot as plt
+
+    print("Mostrando grafo...")
 
     CORES = [
         "red",
@@ -144,7 +146,6 @@ def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
     cores = {}
 
     _, grupos = lawler_recursivo(grafo)
-
     fig = plt.figure(layout="tight")
     ax = fig.add_subplot(111)
 
@@ -153,7 +154,6 @@ def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
     for i, grupo in enumerate(grupos):
         for v in grupo:
             cores[v] = CORES[i]
-            print(f"Coloriu vértice {v} com {cores[v]}")
 
             ax.clear()
             nx.draw_networkx_nodes(
