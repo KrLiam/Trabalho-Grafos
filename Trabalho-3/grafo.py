@@ -200,11 +200,17 @@ class GrafoBipartido(Grafo):
         if u in self._vertices_y:
             u, v = v, u
         
-        if u not in self._vertices_x and v in self._vertices_x:
-            raise ValueError(f"Não pôde inserir aresta {{{u}, {v}}} em grafo bipartido. Ambos os vértices estão em X.")
+        if u in self._vertices_x and v in self._vertices_x:
+            raise ValueError(
+                f"Não pôde inserir aresta {{{u}, {v}}} em grafo bipartido. Ambos os vértices estão em X."
+                + f" X={set(self.verticesX())}, Y={set(self.verticesY())}"
+            )
 
         if u in self._vertices_y and v in self._vertices_y:
-            raise ValueError(f"Não pôde inserir aresta {{{u}, {v}}} em grafo bipartido. Ambos os vértices estão em Y.")
+            raise ValueError(
+                f"Não pôde inserir aresta {{{u}, {v}}} em grafo bipartido. Ambos os vértices estão em Y."
+                + f" X={set(self.verticesX())}, Y={set(self.verticesY())}"
+            )
         
         self._vertices_x.add(u)
         self._vertices_y.add(v)

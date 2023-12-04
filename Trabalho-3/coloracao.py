@@ -51,28 +51,27 @@ def filtrar_arestas(arestas: Iterable[Iterable[int]], subvertices: set[int]):
     }
 
 
-def lawler_recursivo(grafo: Grafo):
+def lawler_recursivo(
+    vertices: set[int],
+    arestas: set[frozenset[int]],
+    cims: tuple[frozenset[int], ...] = (),
+):
     """
     Implementação do algoritmo de Lawler baseada na recorrência.
     Retorna tanto o número cromático como uma tupla contendo os conjuntos
     de vértices de mesma cor.
     """
+    
+    if not len(vertices):
+        return (0, cims)
 
-    def d(
-        S: set[int],
-        arestas: set[frozenset[int]],
-        cims: tuple[frozenset[int], ...] = (),
-    ):
-        if not len(S):
-            return (0, cims)
-
-        c, conjs = min(
-            d(Si := S - I, filtrar_arestas(arestas, Si), cims + (I,))
-            for I in get_I(S, arestas)
+    c, conjs = min(
+        lawler_recursivo(
+            V := vertices - I, filtrar_arestas(arestas, V), cims + (I,)
         )
-        return (c + 1, conjs)
-
-    return d(grafo.vertices(), grafo.arestas())
+        for I in get_I(vertices, arestas)
+    )
+    return (c + 1, conjs)
 
 
 def lawler(grafo: Grafo) -> int:
@@ -145,7 +144,7 @@ def mostrar_coloracao(grafo: Grafo, interval=None):
 
     cores = {}
 
-    _, grupos = lawler_recursivo(grafo)
+    _, grupos = lawler_recursivo(grafo.vertices(), grafo.arestas())
     fig = plt.figure(layout="tight")
     ax = fig.add_subplot(111)
 
@@ -178,7 +177,7 @@ if __name__ == "__main__":
     g = ler_arquivo(nome_arquivo, Grafo)
 
     print("Determinando número cromático do grafo...")
-    numero_cromatico, _ = lawler_recursivo(g)
+    numero_cromatico, _ = lawler_recursivo(g.vertices(), g.arestas())
     print(f"Número cromático: {numero_cromatico}")
 
     try:

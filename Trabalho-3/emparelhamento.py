@@ -67,7 +67,11 @@ def HopcroftKarp(
 
 def main():
     nome_arquivo = input("Arquivo de entrada: ")
-    grafo = ler_arquivo(nome_arquivo, GrafoBipartido)
+    try:
+        grafo = ler_arquivo(nome_arquivo, GrafoBipartido)
+    except ValueError as err:
+        print(f"Erro: {str(err)}")
+        return
 
     X = grafo.verticesX()
     Y = grafo.verticesY()
@@ -93,7 +97,7 @@ def main():
 
     m, mate = HopcroftKarp(grafo, X, Y)
     
-    arestas = set(frozenset(pair) for pair in mate.items())
+    arestas = set(frozenset(pair) for pair in mate.items() if None not in pair)
     print("Emparelhamento máximo:", m)
     print("Arestas:", ", ".join(f"{u}-{v}" for u, v in arestas))
 
