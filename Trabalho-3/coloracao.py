@@ -1,9 +1,8 @@
 from itertools import combinations
 from random import shuffle
 from time import sleep
-from typing import Generator, Iterable, TypeVar, overload
+from typing import Generator, Iterable, TypeVar
 
-from matplotlib.colors import get_named_colors_mapping
 from grafo import Grafo, ler_arquivo
 
 
@@ -53,6 +52,12 @@ def filtrar_arestas(arestas: Iterable[Iterable[int]], subvertices: set[int]):
 
 
 def lawler_recursivo(grafo: Grafo):
+    """
+    Implementação do algoritmo de Lawler baseada na recorrência.
+    Retorna tanto o número cromático como uma tupla contendo os conjuntos
+    de vértices de mesma cor.
+    """
+
     def d(
         S: set[int],
         arestas: set[frozenset[int]],
@@ -71,6 +76,11 @@ def lawler_recursivo(grafo: Grafo):
 
 
 def lawler(grafo: Grafo) -> int:
+    """
+    Algoritmo 34 da apostila. Este algoritmo não foi utilizado, pois
+    a implementação baseada na recorrência é mais eficiente.
+    """
+
     X = {}
 
     X[hash(frozenset())] = 0
@@ -95,53 +105,32 @@ def lawler(grafo: Grafo) -> int:
     return X[hash(S)]
 
 
-def coloracao(grafo: Grafo) -> tuple[int, tuple[frozenset[int], ...]]:
-    vertices = sorted(grafo.vertices(), key=lambda v: -grafo.grau(v))
-
-    cores = {}
-
-    for v in vertices:
-        cores_vizinhos = {cor for u in grafo.vizinhos(v) if (cor := cores.get(u))}
-
-        for c in range(1, len(vertices) + 1):
-            if c not in cores_vizinhos:
-                cores[v] = c
-                break
-
-    k = max(cores[v] for v in vertices)
-    grupos = [set() for _ in range(k)]
-    for v, cor in cores.items():
-        grupos[cor - 1].add(v)
-
-    return (k, tuple(frozenset(g) for g in grupos))
-
-
-CORES = [
-    "red",
-    "blue",
-    "green",
-    "yellow",
-    "cyan",
-    "magenta",
-    "darkblue",
-    "darkred",
-    "violet",
-    "brown",
-    "pink",
-    "teal",
-    "darkviolet",
-    "olive",
-    "lightblue",
-    "lime",
-]
-_extra_colors = [c for c in get_named_colors_mapping() if c not in CORES]
-shuffle(_extra_colors)
-CORES.extend(_extra_colors)
-
-
 def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
     import networkx as nx
+    from matplotlib.colors import get_named_colors_mapping
     import matplotlib.pyplot as plt
+
+    CORES = [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "cyan",
+        "magenta",
+        "darkblue",
+        "darkred",
+        "violet",
+        "brown",
+        "pink",
+        "teal",
+        "darkviolet",
+        "olive",
+        "lightblue",
+        "lime",
+    ]
+    _extra_colors = [c for c in get_named_colors_mapping() if c not in CORES]
+    shuffle(_extra_colors)
+    CORES.extend(_extra_colors)
 
     ng = nx.Graph()
     ng.add_nodes_from(grafo.vertices())
@@ -154,9 +143,7 @@ def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
 
     cores = {}
 
-    print("Determinando número cromático do grafo...")
     _, grupos = lawler_recursivo(grafo)
-    print(f"k = {len(grupos)}")
 
     fig = plt.figure(layout="tight")
     ax = fig.add_subplot(111)
@@ -187,7 +174,14 @@ def mostrar_coloracao(grafo: Grafo, k_cores=None, interval=None):
 
 
 if __name__ == "__main__":
-    g = ler_arquivo("cor4.net")
+    nome_arquivo = input("Arquivo de entrada: ")
+    g = ler_arquivo(nome_arquivo, Grafo)
 
-    print(lawler(g))
-    # mostrar_coloracao(g)
+    print("Determinando número cromático do grafo...")
+    numero_cromatico, _ = lawler_recursivo(g)
+    print(f"Número cromático: {numero_cromatico}")
+
+    try:
+        mostrar_coloracao(g)
+    except ImportError as err:
+        print(f"Instale o modulo {err.name} para ver o grafo :D") 

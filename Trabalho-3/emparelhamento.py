@@ -1,6 +1,4 @@
-from grafo import Grafo, GrafoDirigido, GrafoBipartido, ler_arquivo
-from Ford_Fulkerson import FordFulkerson
-from coloracao import get_I, filtrar_arestas
+from grafo import Grafo, GrafoBipartido, ler_arquivo
 
 
 def bfs(
@@ -67,25 +65,6 @@ def HopcroftKarp(
     return (m,mate)
 
 
-def emparelhamento_fluxo(grafo: Grafo, X: set[int], Y: set[int]):
-    novo_grafo = GrafoDirigido()
-
-    for u, v in grafo.arestas():
-        x, y = (u, v) if u in X else (v, u)
-        novo_grafo.adicionar_aresta(x, y, 1)
-    
-    s = novo_grafo.criar_vertice()
-    for x in X:
-        novo_grafo.adicionar_aresta(s, x, 1)
-
-    t = novo_grafo.criar_vertice()
-    for y in Y:
-        novo_grafo.adicionar_aresta(y, t, 1)
-    
-    grafo_residual = novo_grafo.criar_grafo_residual()
-    _, caminhos = FordFulkerson(novo_grafo, s, t, grafo_residual)
-
-
 def main():
     nome_arquivo = input("Arquivo de entrada: ")
     grafo = ler_arquivo(nome_arquivo, GrafoBipartido)
@@ -113,8 +92,10 @@ def main():
         Y = [int(n) for n in input("Y: ").strip().split()]
 
     m, mate = HopcroftKarp(grafo, X, Y)
-    emparelhamento_fluxo(grafo, X, Y)
-    print(mate)
+    
+    arestas = set(frozenset(pair) for pair in mate.items())
+    print("Emparelhamento máximo:", m)
+    print("Arestas:", ", ".join(f"{u}-{v}" for u, v in arestas))
 
 
 if __name__ == "__main__":
