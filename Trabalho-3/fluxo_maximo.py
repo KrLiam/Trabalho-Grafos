@@ -83,5 +83,5 @@ if __name__ == "__main__":
     s = int(input("Vertice 'S': "))
     t = int(input("Vertice 'T': "))
     
-    A = FordFulkerson(grafo, s, t, grafo_residual)
-    print("Tamanho do fluxo:", A)
+    F, _ = FordFulkerson(grafo, s, t, grafo_residual)
+    print("Tamanho do fluxo:", F)
